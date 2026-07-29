@@ -1,0 +1,31 @@
+// Vercel Serverless Function for /api/ipos (CommonJS pattern for universal Vercel Node runtime compatibility)
+
+const https = require('https');
+
+module.exports = (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Content-Type', 'application/json');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  const target = 'https://investorzone.in/api/ipos?is_active=1&status__in=ANALYSIS_PENDING%2CUNDER_REVIEW%2CREADY%2CLIVE%2CCLOSED&order=open_date.desc&limit=50&select=id%2C%20slug%2C%20ipo_name%2C%20category%2C%20status%2C%20price_band_low%2C%20price_band_high%2C%20issue_size_cr%2C%20lot_size%2C%20open_date%2C%20close_date';
+
+  https.get(target, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    }
+  }, (extRes) => {
+    let body = '';
+    extRes.on('data', chunk => body += chunk);
+    extRes.on('end', () => {
+      res.status(200).send(body);
+    });
+  }).on('error', (err) => {
+    console.error('Vercel ipos error:', err);
+    res.status(500).json({ error: 'Failed to fetch ipos' });
+  });
+};
