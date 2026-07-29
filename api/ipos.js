@@ -1,10 +1,9 @@
-// Vercel Serverless Function for /api/ipos (Native Node.js ServerResponse)
-
 const https = require('https');
 
 module.exports = (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', '*');
   res.setHeader('Content-Type', 'application/json');
 
   if (req.method === 'OPTIONS') {
@@ -17,7 +16,7 @@ module.exports = (req, res) => {
 
   https.get(target, {
     headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     }
   }, (extRes) => {
     let body = '';
@@ -27,8 +26,7 @@ module.exports = (req, res) => {
       res.end(body);
     });
   }).on('error', (err) => {
-    console.error('Vercel ipos error:', err);
     res.statusCode = 500;
-    res.end(JSON.stringify({ error: 'Failed to fetch ipos' }));
+    res.end(JSON.stringify({ error: err.message }));
   });
 };
