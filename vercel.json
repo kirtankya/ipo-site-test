@@ -1,13 +1,8 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/*.js", "use": "@vercel/node" },
-    { "src": "*", "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/api/ipos", "dest": "/api/ipos.js" },
-    { "src": "/api/gmp", "dest": "/api/gmp.js" },
-    { "src": "/api/details", "dest": "/api/details.js" },
-    { "src": "/(.*)", "dest": "/$1" }
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/api/ipos", "destination": "/api/ipos.js" },
+    { "source": "/api/gmp", "destination": "/api/gmp.js" },
+    { "source": "/api/details", "destination": "/api/details.js" }
   ]
 }
