@@ -1,6 +1,7 @@
-// Vercel Serverless Function for /api/details (CommonJS pattern for universal Vercel Node runtime compatibility)
+// Vercel Serverless Function for /api/details (Native Node.js ServerResponse)
 
 const https = require('https');
+const url = require('url');
 
 module.exports = (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -8,13 +9,17 @@ module.exports = (req, res) => {
   res.setHeader('Content-Type', 'application/json');
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
+    res.statusCode = 200;
+    res.end();
     return;
   }
 
-  const slug = req.query?.slug;
+  const parsedUrl = url.parse(req.url, true);
+  const slug = parsedUrl.query?.slug;
+
   if (!slug) {
-    res.status(400).json({ error: 'Missing slug parameter' });
+    res.statusCode = 400;
+    res.end(JSON.stringify({ error: 'Missing slug parameter' }));
     return;
   }
 
@@ -28,10 +33,12 @@ module.exports = (req, res) => {
     let body = '';
     extRes.on('data', chunk => body += chunk);
     extRes.on('end', () => {
-      res.status(200).send(body);
+      res.statusCode = 200;
+      res.end(body);
     });
   }).on('error', (err) => {
     console.error('Vercel details error:', err);
-    res.status(500).json({ error: 'Failed to fetch details' });
+    res.statusCode = 500;
+    res.end(JSON.stringify({ error: 'Failed to fetch details' }));
   });
 };

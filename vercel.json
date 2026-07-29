@@ -1,8 +1,3 @@
 {
-  "version": 2,
-  "rewrites": [
-    { "source": "/api/ipos", "destination": "/api/ipos.js" },
-    { "source": "/api/gmp", "destination": "/api/gmp.js" },
-    { "source": "/api/details", "destination": "/api/details.js" }
-  ]
+  "version": 2
 }

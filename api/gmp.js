@@ -1,4 +1,4 @@
-// Vercel Serverless Function for /api/gmp (CommonJS pattern for universal Vercel Node runtime compatibility)
+// Vercel Serverless Function for /api/gmp (Native Node.js ServerResponse)
 
 const https = require('https');
 
@@ -8,7 +8,8 @@ module.exports = (req, res) => {
   res.setHeader('Content-Type', 'application/json');
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
+    res.statusCode = 200;
+    res.end();
     return;
   }
 
@@ -22,10 +23,12 @@ module.exports = (req, res) => {
     let body = '';
     extRes.on('data', chunk => body += chunk);
     extRes.on('end', () => {
-      res.status(200).send(body);
+      res.statusCode = 200;
+      res.end(body);
     });
   }).on('error', (err) => {
     console.error('Vercel gmp error:', err);
-    res.status(500).json({ error: 'Failed to fetch gmp' });
+    res.statusCode = 500;
+    res.end(JSON.stringify({ error: 'Failed to fetch gmp' }));
   });
 };
