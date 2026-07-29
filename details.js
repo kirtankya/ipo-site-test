@@ -1,4 +1,4 @@
-// Rich Details Page Logic with Server Proxy Support
+// Rich Details Page Logic with Vercel Edge Serverless Support
 
 function sanitizeText(str) {
   if (!str) return '';
@@ -9,7 +9,7 @@ function sanitizeText(str) {
     .replace(/investorgain\.com/gi, '');
 }
 
-const LOCAL_SERVER = 'http://localhost:5000';
+const LIVE_SERVER = 'https://ipo-site-test.vercel.app';
 
 const _0x1a = 'aHR0cHM6Ly9pbnZlc3RvcnpvbmUuaW4vYXBpL2lwb3M=';
 const _0x2b = 'aHR0cHM6Ly93ZWJub2RlanMuaW52ZXN0b3JnYWluLmNvbS9jbG91ZC92Mi9pbmRleC9nbXAtZGF0YQ==';
@@ -33,16 +33,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function fetchApi(path, fallbackUrl) {
-  try {
-    const res = await fetch(LOCAL_SERVER + path);
-    if (res.ok) return await res.json();
-  } catch (err) {}
-
+  // 1. Try relative endpoint first (Works on Vercel Live Deployment)
   try {
     const res = await fetch(path);
     if (res.ok) return await res.json();
-  } catch (err) {}
+  } catch (err) { }
 
+  // 2. Try Vercel Live Server proxy URL
+  try {
+    const res = await fetch(LIVE_SERVER + path);
+    if (res.ok) return await res.json();
+  } catch (err) { }
+
+  // 3. Fallback for static file:// protocol
   const proxyUrl = atob(_0x3c) + encodeURIComponent(fallbackUrl);
   const res = await fetch(proxyUrl);
   return await res.json();
@@ -92,7 +95,7 @@ async function fetchIpoDetails(slug) {
 
 function renderDetails(item, gmpData) {
   const container = document.getElementById('detailsContent');
-  
+
   // Status Formatting
   let statusText = item.status ? item.status.replace(/_/g, ' ') : 'CLOSED';
   let statusClass = 'badge-closed';
@@ -110,7 +113,7 @@ function renderDetails(item, gmpData) {
   const priceLow = parseFloat(item.price_band_low) || 0;
   const priceHigh = parseFloat(item.price_band_high) || priceLow;
   const priceText = priceHigh > priceLow ? `₹${priceLow} - ₹${priceHigh}` : `₹${priceLow || '-'}`;
-  
+
   const lotSize = parseInt(item.lot_size) || 0;
   const minRetailAmt = priceHigh * lotSize;
 

@@ -9,7 +9,7 @@ function sanitizeText(str) {
     .replace(/investorgain\.com/gi, '');
 }
 
-const LOCAL_SERVER = 'http://localhost:5000';
+const LIVE_SERVER = 'https://ipo-site-test.vercel.app';
 
 // Hidden fallback obfuscated URLs for static file:// protocol
 const _0x1a = 'aHR0cHM6Ly9pbnZlc3RvcnpvbmUuaW4vYXBpL2lwb3M=';
@@ -28,18 +28,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function fetchApi(path, fallbackUrl) {
-  // 1. Try local proxy server on port 5000 or relative endpoint (hides all external domains in DevTools Network tab)
-  try {
-    const res = await fetch(LOCAL_SERVER + path);
-    if (res.ok) return await res.json();
-  } catch (err) {}
-
+  // 1. Try relative endpoint first (Works on Vercel Live Deployment)
   try {
     const res = await fetch(path);
     if (res.ok) return await res.json();
-  } catch (err) {}
+  } catch (err) { }
 
-  // 2. Static file:// protocol fallback
+  // 2. Try Vercel Live Server proxy URL
+  try {
+    const res = await fetch(LIVE_SERVER + path);
+    if (res.ok) return await res.json();
+  } catch (err) { }
+
+  // 3. Fallback for static file:// protocol
   const proxyUrl = atob(_0x3c) + encodeURIComponent(fallbackUrl);
   const res = await fetch(proxyUrl);
   return await res.json();
@@ -73,7 +74,7 @@ async function fetchData() {
     // Merge data & sanitize text
     allIpos = izData.map(item => {
       const cleanName = item.ipo_name.toLowerCase().replace(/ipo/g, '').replace(/[^a-z0-9]/g, '');
-      
+
       let matchedGmp = null;
       for (let [key, gmpObj] of gmpMap.entries()) {
         if (cleanName.includes(key) || key.includes(cleanName)) {
@@ -170,8 +171,8 @@ function renderTable() {
       statusClass = 'badge-upcoming';
     }
 
-    const priceText = item.price_band_high 
-      ? `₹${item.price_band_low} - ₹${item.price_band_high}` 
+    const priceText = item.price_band_high
+      ? `₹${item.price_band_low} - ₹${item.price_band_high}`
       : `₹${item.price_band_low || '-'}`;
 
     const gmpPercNum = parseFloat(item.gmp_perc) || 0;
