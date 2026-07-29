@@ -9,7 +9,8 @@ function sanitizeText(str) {
     .replace(/investorgain\.com/gi, '');
 }
 
-const LIVE_SERVER = 'https://ipo-site-test.netlify.app';
+const IZ_DIRECT = 'https://investorzone.in/api/ipos?is_active=1&status__in=ANALYSIS_PENDING%2CUNDER_REVIEW%2CREADY%2CLIVE%2CCLOSED&order=open_date.desc&limit=50&select=id%2C%20slug%2C%20ipo_name%2C%20category%2C%20status%2C%20price_band_low%2C%20price_band_high%2C%20issue_size_cr%2C%20lot_size%2C%20open_date%2C%20close_date';
+const GMP_DIRECT = 'https://webnodejs.investorgain.com/cloud/v2/index/gmp-data';
 
 let allIpos = [];
 
@@ -22,14 +23,20 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('refreshBtn').addEventListener('click', fetchData);
 });
 
-async function fetchApi(path) {
+async function fetchApi(path, directUrl) {
+  // 1. Try local/serverless proxy route
   try {
     const res = await fetch(path);
     if (res.ok) return await res.json();
   } catch (err) {}
 
-  const res = await fetch(LIVE_SERVER + path);
-  return await res.json();
+  // 2. Direct browser fetch fallback (Guarantees data loading on all browsers)
+  try {
+    const res = await fetch(directUrl);
+    if (res.ok) return await res.json();
+  } catch (err) {}
+
+  return null;
 }
 
 async function fetchData() {
@@ -38,13 +45,15 @@ async function fetchData() {
 
   try {
     const [izRes, gmpRes] = await Promise.allSettled([
-      fetchApi('/api/ipos'),
-      fetchApi('/api/gmp')
+      fetchApi('/api/ipos', IZ_DIRECT),
+      fetchApi('/api/gmp', GMP_DIRECT)
     ]);
 
     let izData = [];
     if (izRes.status === 'fulfilled' && izRes.value && izRes.value.data) {
       izData = izRes.value.data;
+    } else if (izRes.status === 'fulfilled' && Array.isArray(izRes.value)) {
+      izData = izRes.value;
     }
 
     let gmpMap = new Map();

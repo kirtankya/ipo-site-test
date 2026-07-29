@@ -21,7 +21,8 @@ exports.handler = async (event, context) => {
     };
   }
 
-  const target = `https://investorzone.in/api/ipos?slug=${encodeURIComponent(slug)}&select=*%2C%20issuers(name%2C%20sector)`;
+  const baseUrl = process.env.API_DETAILS_URL || 'https://investorzone.in/api/ipos';
+  const target = `${baseUrl}?slug=${encodeURIComponent(slug)}&select=*%2C%20issuers(name%2C%20sector)`;
 
   return new Promise((resolve) => {
     https.get(target, {

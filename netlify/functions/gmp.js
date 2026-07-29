@@ -12,7 +12,7 @@ exports.handler = async (event, context) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  const target = 'https://webnodejs.investorgain.com/cloud/v2/index/gmp-data';
+  const target = process.env.API_GMP_URL || 'https://webnodejs.investorgain.com/cloud/v2/index/gmp-data';
 
   return new Promise((resolve) => {
     https.get(target, {

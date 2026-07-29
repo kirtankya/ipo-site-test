@@ -32,7 +32,7 @@ async function fetchApi(path) {
   try {
     const res = await fetch(path);
     if (res.ok) return await res.json();
-  } catch (err) {}
+  } catch (err) { }
 
   const res = await fetch(LIVE_SERVER + path);
   return await res.json();
@@ -81,7 +81,7 @@ async function fetchIpoDetails(slug) {
 
 function renderDetails(item, gmpData) {
   const container = document.getElementById('detailsContent');
-  
+
   // Status Formatting
   let statusText = item.status ? item.status.replace(/_/g, ' ') : 'CLOSED';
   let statusClass = 'badge-closed';
@@ -99,7 +99,7 @@ function renderDetails(item, gmpData) {
   const priceLow = parseFloat(item.price_band_low) || 0;
   const priceHigh = parseFloat(item.price_band_high) || priceLow;
   const priceText = priceHigh > priceLow ? `₹${priceLow} - ₹${priceHigh}` : `₹${priceLow || '-'}`;
-  
+
   const lotSize = parseInt(item.lot_size) || 0;
   const minRetailAmt = priceHigh * lotSize;
 
