@@ -1,0 +1,18 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/ipos"
+  to = "/.netlify/functions/ipos"
+  status = 200
+
+[[redirects]]
+  from = "/api/gmp"
+  to = "/.netlify/functions/gmp"
+  status = 200
+
+[[redirects]]
+  from = "/api/details"
+  to = "/.netlify/functions/details"
+  status = 200

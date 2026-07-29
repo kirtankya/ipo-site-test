@@ -9,7 +9,7 @@ function sanitizeText(str) {
     .replace(/investorgain\.com/gi, '');
 }
 
-const LIVE_SERVER = 'https://ipo-site-test.vercel.app';
+const LIVE_SERVER = 'https://ipo-site-test.netlify.app';
 
 document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
